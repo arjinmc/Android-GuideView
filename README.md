@@ -1,7 +1,7 @@
 # Android-GuideView
 An Android GuideView for step by step to lead users.
 
-Refer to [repertory:GuideView](https://github.com/laxian/GuideView) of [laxian](https://github.com/laxian)
+Refer to [repertory:GuideView](https://github.com/laxian/GuideView) of [laxian](https://github.com/laxian).
 By the way, thanks laxin who has share this awesome GuideView.
 
 This repertory is an enhanced edition.
