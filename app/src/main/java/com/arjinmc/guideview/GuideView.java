@@ -151,6 +151,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         addView(mTipsView);
         setVisibility(View.GONE);
+        setBackgroundColor(Color.TRANSPARENT);
 
         mTargetView.getViewTreeObserver().addOnGlobalLayoutListener(this);
     }
@@ -162,9 +163,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
 
         if (mParentView == null)
             return;
-        mTargetView.requestLayout();
         if (getVisibility() == View.GONE) {
-            setBackgroundColor(Color.TRANSPARENT);
             setVisibility(View.VISIBLE);
             mParentView.addView(this);
         }
@@ -226,7 +225,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         //drawbackground
         path.addRect(0, 0, tempCanvas.getWidth(), tempCanvas.getHeight(), Path.Direction.CW);
 
-        // draw targetView
+        // draw focus targetView
         switch (mShape) {
             //draw oval
             case SHAPE_OVAL:

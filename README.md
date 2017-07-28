@@ -11,46 +11,104 @@ This repertory is an enhanced edition.
 ![img](https://github.com/arjinmc/Android-GuideView/blob/master/images/sample.gif)
 
 ## How to Use
+This GuideView need a target view and a tips view:
+* target view: you want to focus on it.
+* tips view: the tips will show when ui focus on the target view.
+
+```java
+GuideView.Builder guideWiewBuilder = new GuideView.Builder(activitycontext);
+GuideView guideView = guideWiewBuilder.create()
+```
+or
+```java
+GuideView guideView = new GuideView.Builder(activitycontext).create();
+```
+
+## GuideView.Builder
+### target view
+Here are two methods can set target view.
+
+* targetView(View view)
+* targetView(R.id.viewId)
+
+### tips view
+Here are two methods can set target view.
+
+* tipsView(view)
+* tipsView(R.layout.layoutId)
+
+### click focus part
+* isShouldClickFocus  
+Set if need to click the target view to dismiss the GuidView or not. Default value is true.
+* isRealClickFocus  
+Set if need to real click the target view to dissmiss and it will callback the target view's OnClickListenter or onTouchEvent. Defaul is false
+
+<strong>Attention:</strong>  
+Set isRealClickFocus true required the value of isShouldClickFocus is true, otherwise it won't work
+
+### Focus part on target view shape types support
+* shape(shapeType) 
+default shape type is CIRCLE.
+
+<strong>ShapeTypes values</strong>
+
+* SHAPE_CIRCLE 
+* SHAPE_OVAL
+* SHAPE_RECTANGLE (including round rectangle)  
+You can set the <i>radian</i> attribute to make a round retangle.  
+You can set the <i>roundRectOffset</i> attribute control the order offset.
+
+### offset on x,y axis
+This offset is for tips view relative to target view on x,y axis,default values is zero.
+* offsetX(int)
+* offsetY(int)
+
+### layout gravity of tips view
+This layout gravity is relative to target view.
+* layoutGravity(gravityInt)  default value is Gravity.BOTTOM
+
+<strong>Values<strong>
+* Gravity.LEFT
+* Gravity.TOP
+* Gravity.RIGHT
+* Gravity.BOTTOM
+
+### background color
+bgColor(colorInt) default color is #b0000000
+
+### OnDismissListener
+Callback for dismiss.
+```java
+onDismissListener(new GuideView.OnDismissListener() {
+    @Override
+    public void onDismiss() {
+        //do your things
+    }
+})
+```
+or use GuidView
+```java
+guideView.setOnDismissListener(new GuideView.OnDismissListener() {
+    @Override
+    public void onDismiss() {
+        //do your things
+    }
+});
+```
+
+### Example
 ```java
 GuideView guideView = new GuideView.Builder(activitycontext)
-                //set background color
                 .bgColor(Color.parseColor("#b0239823"))
-                //set the target view
                 .targetView(tv2)
-//                .targetView(R.id.ll3)
-                //set the tips view 
                 .tipsView(createTextView())
-//                .tipsView(R.layout.layout_linearlayout)
-                 //set if need to click the target view to dismiss the guidview
-                 //default is true
 //                .isShouldClickFocus(false)
-                //set if need to real click the target view to dissmiss
-                //and it will callback the target view onclickListenter
-                //defual is false
-                //
-                //attention:
-                // set this true required the value of isShouldClickFocus is true
-                // or it won't work
 //                .isRealClickFocus(true)
-                //set the shape of focus effect
-                //default is circle
                 .shape(GuideView.SHAPE_RECTANGLE)
-                
-                //if shape is rectangle,
-                // you can set the radian to make a round retangle
-                // .radian(10)
-                //you can set the roundRectOffset control the order offset
+                //.radian(10)
                 //.roundRectOffset(30)
-               
-                //set offset of x axis,default is 0
-                .offsetX(0)
-                //set offset of y axis,default is 0
                 .offsetY(20)
-                //set the layout gravity of tips view
-                //values is Gravity.LEFT/TOP/RIGHT/BOTTOM
-                //default is Gravity.BOTTOM
                .layoutGravity(Gravity.BOTTOM)
-               //set ondimiss listener
 //                .onDismissListener(new GuideView.OnDismissListener() {
 //                    @Override
 //                    public void onDismiss() {
@@ -59,14 +117,4 @@ GuideView guideView = new GuideView.Builder(activitycontext)
 //                })
 //                
                 .create();
-```
-
-You also can set OnDismissListener like this:
-```java
-guideView.setOnDismissListener(new GuideView.OnDismissListener() {
-    @Override
-    public void onDismiss() {
-        //do your things
-    }
-});
 ```
