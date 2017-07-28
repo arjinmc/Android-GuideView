@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 //                    }
 //                })
 //                .bgColor(Color.parseColor("#b0239823"))
+                .blurRadius(5)
                 .create();
 
 //        guideView1.setOnDismissListener(new GuideView.OnDismissListener() {

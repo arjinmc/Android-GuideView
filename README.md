@@ -76,6 +76,11 @@ This layout gravity is relative to target view.
 ### background color
 bgColor(colorInt) default color is #b0000000
 
+### blurRadius
+
+* blurRadius(float)  
+Control to the blur effect on target view. Default is zero. It will work if bigger than zero.
+
 ### OnDismissListener
 Callback for dismiss.
 ```java
@@ -100,6 +105,7 @@ guideView.setOnDismissListener(new GuideView.OnDismissListener() {
 ```java
 GuideView guideView = new GuideView.Builder(activitycontext)
                 .bgColor(Color.parseColor("#b0239823"))
+                .blurRadius(5)
                 .targetView(tv2)
                 .tipsView(createTextView())
 //                .isShouldClickFocus(false)

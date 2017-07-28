@@ -3,6 +3,7 @@ package com.arjinmc.guideview;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -40,6 +41,10 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     public static final int DEFAULT_BACKGROUND_COLOR = Color.parseColor("#b0000000");
 
     private int mBackgroudColor;
+    /**
+     * use blurmask
+     */
+    private float mBlurRadius;
     /**
      * the shape of focus on targetview,default is circle
      */
@@ -112,6 +117,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
 
     public void setParams(Param params) throws GuideViewInitException {
         mBackgroudColor = params.backgroundColor;
+        mBlurRadius = params.blurRadius;
         mShape = params.shape;
         mRadian = params.radian;
         mRoundRectOffset = params.roundRectOffset;
@@ -146,6 +152,8 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         mPaint.setColor(mBackgroudColor);
+        if (mBlurRadius > 0)
+            mPaint.setMaskFilter(new BlurMaskFilter(mBlurRadius, BlurMaskFilter.Blur.NORMAL));
 
         setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -396,6 +404,11 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
             return this;
         }
 
+        public Builder blurRadius(float blurRadius) {
+            param.blurRadius = blurRadius;
+            return this;
+        }
+
         public Builder shape(int shape) {
             if (shape > GuideView.SHAPE_TYPE_COUNT - 1 || shape < 0)
                 shape = GuideView.SHAPE_CIRCLE;
@@ -480,6 +493,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     public static class Param {
         public int backgroundColor = GuideView.DEFAULT_BACKGROUND_COLOR;
         public int shape = GuideView.SHAPE_CIRCLE;
+        public float blurRadius;
         public float radian;
         public int roundRectOffset = 6;
         public boolean isShouldClickFocus = true;
