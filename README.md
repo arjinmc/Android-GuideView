@@ -38,9 +38,9 @@ Here are two methods can set target view.
 * tipsView(R.layout.layoutId)
 
 ### click focus part
-* isShouldClickFocus  
+* isShouldClickFocus(boolean)  
 Set if need to click the target view to dismiss the GuidView or not. Default value is true.
-* isRealClickFocus  
+* isRealClickFocus(boolean)  
 Set if need to real click the target view to dissmiss and it will callback the target view's OnClickListenter or onTouchEvent. Defaul is false
 
 <strong>Attention:</strong>  
