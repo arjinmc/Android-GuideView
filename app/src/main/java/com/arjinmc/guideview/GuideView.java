@@ -48,8 +48,6 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     private float mRadian;
     //offset of round rect->round rectangle
     private int mRoundRectOffset;
-    // if use blurred effect
-    private boolean isBlurred;
     /**
      * set if need to click the focus part to dismiss this view,default is true
      */
@@ -117,7 +115,6 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         mShape = params.shape;
         mRadian = params.radian;
         mRoundRectOffset = params.roundRectOffset;
-        isBlurred = params.isBlurred;
         isShouldClickFocus = params.isShouldClickFocus;
         isRealClickFocus = params.isRealClickFocus;
         mTargetView = params.targetView;
@@ -417,11 +414,6 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
             return this;
         }
 
-        public Builder isBlurred(boolean isBlurred) {
-            param.isBlurred = isBlurred;
-            return this;
-        }
-
         /**
          * set if need to click the focus part to dismiss this view
          *
@@ -491,7 +483,6 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         public int shape = GuideView.SHAPE_CIRCLE;
         public float radian;
         public int roundRectOffset = 6;
-        public boolean isBlurred = false;
         public boolean isShouldClickFocus = true;
         public boolean isRealClickFocus = false;
         public View targetView;
