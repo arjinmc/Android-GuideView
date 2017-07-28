@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         final GuideView guideView1 = new GuideView.Builder(this)
                 .targetView(tv2)
 //                .targetView(R.id.ll3)
-                .isShouldClickFocus(false)
+//                .isShouldClickFocus(false)
 //                .isRealClickFocus(true)
                 .tipsView(createTextView())
 //                .tipsView(R.layout.layout_linearlayout)
