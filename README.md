@@ -67,7 +67,7 @@ This offset is for tips view relative to target view on x,y axis,default values 
 This layout gravity is relative to target view.
 * layoutGravity(gravityInt)  default value is Gravity.BOTTOM
 
-<strong>Values<strong>
+<strong>Values</strong>
 * Gravity.LEFT
 * Gravity.TOP
 * Gravity.RIGHT
