@@ -7,8 +7,9 @@ import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.os.Build;
 import android.support.annotation.ColorInt;
@@ -88,8 +89,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     private int mRadius;
     private boolean isFirstShown = true;
 
-    private Paint mPaint;
-    private Path mPath;
+    private Paint mBackgroundPaint, mFocusPaint;
     private Bitmap mBitmap;
 
     private Context mContext;
@@ -132,9 +132,9 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         mOffsetY = params.offsetY;
         mOnDismissListener = params.onDismissListener;
 
-        if (mContext instanceof Activity &&
-                ((Activity) mContext).getWindow().getDecorView() instanceof ViewGroup) {
-            mParentView = (ViewGroup) ((Activity) mContext).getWindow().getDecorView();
+        if (mContext instanceof Activity) {
+            mParentView = (ViewGroup) (((Activity) mContext).getWindow().getDecorView()
+                    .findViewById(android.R.id.content)).getParent().getParent();
         } else
             throw new GuideViewInitException("This context cannot use this view!");
 
@@ -150,13 +150,15 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
 
     public void init() {
 
-        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPaint.setColor(mBackgroudColor);
-        if (mBlurRadius > 0)
-            mPaint.setMaskFilter(new BlurMaskFilter(mBlurRadius, BlurMaskFilter.Blur.NORMAL));
+        mBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mBackgroundPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mBackgroundPaint.setColor(mBackgroudColor);
 
-        mPath = new Path();
+        mFocusPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mBackgroundPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mFocusPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        if (mBlurRadius > 0)
+            mFocusPaint.setMaskFilter(new BlurMaskFilter(mBlurRadius, BlurMaskFilter.Blur.NORMAL));
 
         setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -232,9 +234,8 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         mBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas tempCanvas = new Canvas(mBitmap);
 
-        mPath.reset();
         //drawbackground
-        mPath.addRect(0, 0, tempCanvas.getWidth(), tempCanvas.getHeight(), Path.Direction.CW);
+        tempCanvas.drawRect(0, 0, tempCanvas.getWidth(), tempCanvas.getHeight(), mBackgroundPaint);
 
         // draw focus targetView
         switch (mShape) {
@@ -245,7 +246,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
                 ovalRectF.top = mTargetViewCenterPoint.y - mRadius / 2 - mTargetView.getHeight() / 2;
                 ovalRectF.right = mTargetViewCenterPoint.x + mRadius / 2 + mTargetView.getWidth() / 2;
                 ovalRectF.bottom = mTargetViewCenterPoint.y + mRadius / 2 + mTargetView.getHeight() / 2;
-                mPath.addOval(ovalRectF, Path.Direction.CCW);
+                tempCanvas.drawOval(ovalRectF, mFocusPaint);
                 break;
             //draw rectangle
             case SHAPE_RECTANGLE:
@@ -255,23 +256,20 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
                 rectRectF.right = mTargetViewRight + mRoundRectOffset;
                 rectRectF.bottom = mTargetViewBottom + mRoundRectOffset;
                 if (mRadian == 0) {
-                    mPath.addRect(rectRectF, Path.Direction.CCW);
+                    tempCanvas.drawRect(rectRectF, mFocusPaint);
                 } else {
                     //draw round rectangle
-                    mPath.addRoundRect(rectRectF
-                            , new float[]{mRadian, mRadian, mRadian, mRadian
-                                    , mRadian, mRadian, mRadian, mRadian}, Path.Direction.CCW);
+                    tempCanvas.drawRoundRect(rectRectF, mRadian, mRadian, mFocusPaint);
                 }
                 break;
             //draw circle
             default:
-                mPath.addCircle(mTargetViewCenterPoint.x
+                tempCanvas.drawCircle(mTargetViewCenterPoint.x
                         , mTargetViewCenterPoint.y
-                        , mRadius, Path.Direction.CCW);
+                        , mRadius, mFocusPaint);
                 break;
         }
-        tempCanvas.drawPath(mPath, mPaint);
-        canvas.drawBitmap(mBitmap, 0, 0, mPaint);
+        canvas.drawBitmap(mBitmap, 0, 0, mBackgroundPaint);
         mBitmap.recycle();
 
     }
@@ -371,6 +369,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         if (mTargetViewLocation == null) {
             mTargetViewLocation = new int[2];
             mTargetView.getLocationInWindow(mTargetViewLocation);
+            mTargetViewLocation[1] = mTargetViewLocation[1] - getStatusBarHeight(mContext);
             mTargetViewLeft = mTargetViewLocation[0];
             mTargetViewTop = mTargetViewLocation[1];
             mTargetViewRight = mTargetViewLocation[0] + mTargetView.getWidth();
@@ -380,6 +379,15 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
                     mTargetViewLocation[0] + mTargetView.getWidth() / 2
                     , mTargetViewLocation[1] + mTargetView.getHeight() / 2);
         }
+    }
+
+    private int getStatusBarHeight(Context context) {
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
     public static class Builder {
