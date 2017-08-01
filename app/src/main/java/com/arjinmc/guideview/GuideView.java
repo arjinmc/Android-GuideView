@@ -89,6 +89,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     private boolean isFirstShown = true;
 
     private Paint mPaint;
+    private Path mPath;
     private Bitmap mBitmap;
 
     private Context mContext;
@@ -154,6 +155,8 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         mPaint.setColor(mBackgroudColor);
         if (mBlurRadius > 0)
             mPaint.setMaskFilter(new BlurMaskFilter(mBlurRadius, BlurMaskFilter.Blur.NORMAL));
+
+        mPath = new Path();
 
         setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -229,9 +232,9 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         mBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas tempCanvas = new Canvas(mBitmap);
 
-        Path path = new Path();
+        mPath.reset();
         //drawbackground
-        path.addRect(0, 0, tempCanvas.getWidth(), tempCanvas.getHeight(), Path.Direction.CW);
+        mPath.addRect(0, 0, tempCanvas.getWidth(), tempCanvas.getHeight(), Path.Direction.CW);
 
         // draw focus targetView
         switch (mShape) {
@@ -242,7 +245,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
                 ovalRectF.top = mTargetViewCenterPoint.y - mRadius / 2 - mTargetView.getHeight() / 2;
                 ovalRectF.right = mTargetViewCenterPoint.x + mRadius / 2 + mTargetView.getWidth() / 2;
                 ovalRectF.bottom = mTargetViewCenterPoint.y + mRadius / 2 + mTargetView.getHeight() / 2;
-                path.addOval(ovalRectF, Path.Direction.CCW);
+                mPath.addOval(ovalRectF, Path.Direction.CCW);
                 break;
             //draw rectangle
             case SHAPE_RECTANGLE:
@@ -252,22 +255,22 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
                 rectRectF.right = mTargetViewRight + mRoundRectOffset;
                 rectRectF.bottom = mTargetViewBottom + mRoundRectOffset;
                 if (mRadian == 0) {
-                    path.addRect(rectRectF, Path.Direction.CCW);
+                    mPath.addRect(rectRectF, Path.Direction.CCW);
                 } else {
                     //draw round rectangle
-                    path.addRoundRect(rectRectF
+                    mPath.addRoundRect(rectRectF
                             , new float[]{mRadian, mRadian, mRadian, mRadian
                                     , mRadian, mRadian, mRadian, mRadian}, Path.Direction.CCW);
                 }
                 break;
             //draw circle
             default:
-                path.addCircle(mTargetViewCenterPoint.x
+                mPath.addCircle(mTargetViewCenterPoint.x
                         , mTargetViewCenterPoint.y
                         , mRadius, Path.Direction.CCW);
                 break;
         }
-        tempCanvas.drawPath(path, mPaint);
+        tempCanvas.drawPath(mPath, mPaint);
         canvas.drawBitmap(mBitmap, 0, 0, mPaint);
         mBitmap.recycle();
 
