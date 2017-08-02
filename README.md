@@ -131,8 +131,8 @@ GuideView guideView = new GuideView.Builder(activitycontext)
                 .create();
 ```
 
-## GuideViewQueque
-GuideViewQueque is a static queue for guideviews.It will show every GuideView you haved added in order and finally callback the OnFinallyDismissListener,it will be null when its jobs is done.
+## GuideViewQueue
+GuideViewQueue is a static queue for guideviews.It will show every GuideView you haved added in order and finally callback the OnFinallyDismissListener,it will be null when its jobs is done.
 
 Here is a sample below:
 ```java
