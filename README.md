@@ -82,6 +82,10 @@ bgColor(colorInt) default color is #b0000000
 * blurRadius(float)  
 Control to the blur effect on target view. Default is zero. It will work if bigger than zero.
 
+### focusToShake
+* focusToShake(boolean)  
+Control if need to shake the focus part on target view. It will cost some cpu,gpu consumption. Default value is false.
+
 ### OnDismissListener
 Callback for dismiss.
 ```java
@@ -112,6 +116,7 @@ GuideView guideView = new GuideView.Builder(activitycontext)
 //                .isShouldClickFocus(false)
 //                .isRealClickFocus(true)
                 .shape(GuideView.SHAPE_RECTANGLE)
+                //.focusToShake(true)
                 //.radian(10)
                 //.roundRectOffset(30)
                 .offsetY(20)

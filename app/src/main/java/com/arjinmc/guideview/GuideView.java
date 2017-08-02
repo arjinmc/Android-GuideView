@@ -41,6 +41,9 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     public static final int SHAPE_TYPE_COUNT = 3;
     public static final int DEFAULT_BACKGROUND_COLOR = Color.parseColor("#b0000000");
 
+    private final int DEFAULT_FOCUS_TO_SHAKE_STEP = 6;
+    private final int DEFAULT_FOCUS_TO_SHAKE_DELAY_TIME = 250;
+
     private int mBackgroudColor;
     /**
      * use blurmask
@@ -81,6 +84,11 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
      * the offset of tipsview to targetview for x,y axis
      */
     private int mOffsetX, mOffsetY;
+    /**
+     * set if need to shake when focus on target view
+     */
+    private boolean mFocusToShake;
+    private int mFocusToShakeStep;
 
     private ViewGroup mParentView;
     private int mTargetViewLeft, mTargetViewTop, mTargetViewRight, mTargetViewBottom;
@@ -132,6 +140,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         mTipsViewLayoutGravity = params.layoutGravity;
         mOffsetX = params.offsetX;
         mOffsetY = params.offsetY;
+        mFocusToShake = params.focusToShake;
         mOnDismissListener = params.onDismissListener;
 
         if (mContext instanceof Activity) {
@@ -157,7 +166,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         mBackgroundPaint.setColor(mBackgroudColor);
 
         mFocusPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mBackgroundPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mFocusPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         mFocusPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         if (mBlurRadius > 0)
             mFocusPaint.setMaskFilter(new BlurMaskFilter(mBlurRadius, BlurMaskFilter.Blur.NORMAL));
@@ -237,7 +246,8 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        mBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
+        if (mBitmap == null || mBitmap.isRecycled())
+            mBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas tempCanvas = new Canvas(mBitmap);
 
         //drawbackground
@@ -248,19 +258,23 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
             //draw oval
             case SHAPE_OVAL:
                 RectF ovalRectF = new RectF();
-                ovalRectF.left = mTargetViewCenterPoint.x - mRadius / 2 - mTargetView.getWidth() / 2;
-                ovalRectF.top = mTargetViewCenterPoint.y - mRadius / 3 - getStatusBarHeight(mContext) - mTargetView.getHeight() / 2;
-                ovalRectF.right = mTargetViewCenterPoint.x + mRadius / 2 + mTargetView.getWidth() / 2;
-                ovalRectF.bottom = mTargetViewCenterPoint.y + mRadius / 3 - getStatusBarHeight(mContext) + mTargetView.getHeight() / 2;
+                ovalRectF.left = mTargetViewCenterPoint.x - mRadius / 2
+                        - mTargetView.getWidth() / 2- mFocusToShakeStep;
+                ovalRectF.top = mTargetViewCenterPoint.y - mRadius / 3
+                        - getStatusBarHeight(mContext) - mTargetView.getHeight() / 2- mFocusToShakeStep;
+                ovalRectF.right = mTargetViewCenterPoint.x + mRadius / 2
+                        + mTargetView.getWidth() / 2+ mFocusToShakeStep;
+                ovalRectF.bottom = mTargetViewCenterPoint.y + mRadius / 3
+                        - getStatusBarHeight(mContext) + mTargetView.getHeight() / 2+ mFocusToShakeStep;
                 tempCanvas.drawOval(ovalRectF, mFocusPaint);
                 break;
             //draw rectangle
             case SHAPE_RECTANGLE:
                 RectF rectRectF = new RectF();
-                rectRectF.left = mTargetViewLeft - mRoundRectOffset;
-                rectRectF.top = mTargetViewTop - getStatusBarHeight(mContext) - mRoundRectOffset;
-                rectRectF.right = mTargetViewRight + mRoundRectOffset;
-                rectRectF.bottom = mTargetViewBottom - getStatusBarHeight(mContext) + mRoundRectOffset;
+                rectRectF.left = mTargetViewLeft - mRoundRectOffset - mFocusToShakeStep;
+                rectRectF.top = mTargetViewTop - getStatusBarHeight(mContext) - mRoundRectOffset - mFocusToShakeStep;
+                rectRectF.right = mTargetViewRight + mRoundRectOffset + mFocusToShakeStep;
+                rectRectF.bottom = mTargetViewBottom - getStatusBarHeight(mContext) + mRoundRectOffset + mFocusToShakeStep;
                 if (mRadian == 0) {
                     tempCanvas.drawRect(rectRectF, mFocusPaint);
                 } else {
@@ -272,11 +286,13 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
             default:
                 tempCanvas.drawCircle(mTargetViewCenterPoint.x
                         , mTargetViewCenterPoint.y - getStatusBarHeight(mContext)
-                        , mRadius, mFocusPaint);
+                        , mRadius+mFocusToShakeStep, mFocusPaint);
                 break;
         }
         canvas.drawBitmap(mBitmap, 0, 0, mBackgroundPaint);
-        mBitmap.recycle();
+        if (!mFocusToShake)
+            mBitmap.recycle();
+        focusShake();
 
     }
 
@@ -293,7 +309,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
             switch (mTipsViewLayoutGravity) {
                 case Gravity.NO_GRAVITY:
                     mTipsView.layout(
-                            0,0,mTipsView.getMeasuredWidth(), mTipsView.getMeasuredHeight());
+                            0, 0, mTipsView.getMeasuredWidth(), mTipsView.getMeasuredHeight());
                     break;
                 case Gravity.TOP:
                     x = mTargetViewCenterPoint.x + mOffsetX;
@@ -421,6 +437,21 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         return result;
     }
 
+    /**
+     * focus shake the target view
+     */
+    private void focusShake() {
+        if (mFocusToShake) {
+            if (mFocusToShakeStep == 0) {
+                mFocusToShakeStep = DEFAULT_FOCUS_TO_SHAKE_STEP;
+            } else {
+                mFocusToShakeStep = 0;
+            }
+
+            postInvalidateDelayed(DEFAULT_FOCUS_TO_SHAKE_DELAY_TIME);
+        }
+    }
+
     public static class Builder {
 
         public Param param;
@@ -525,6 +556,11 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
             return this;
         }
 
+        public Builder focusToShake(boolean focusToShake) {
+            param.focusToShake = focusToShake;
+            return this;
+        }
+
         public Builder onDismissListener(OnDismissListener onDismissListener) {
             param.onDismissListener = onDismissListener;
             return this;
@@ -546,6 +582,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         public int layoutGravity;
         public int targetViewId;
         public int tipsViewResId;
+        public boolean focusToShake = false;
         public OnDismissListener onDismissListener;
     }
 

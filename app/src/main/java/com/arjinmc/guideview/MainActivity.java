@@ -35,8 +35,9 @@ public class MainActivity extends AppCompatActivity {
                 .tipsView(R.layout.layout_linearlayout)
                 .offsetX(0)
                 .offsetY(0)
-                .shape(GuideView.SHAPE_RECTANGLE)
+//                .shape(GuideView.SHAPE_RECTANGLE)
 //                .shape(GuideView.SHAPE_OVAL)
+//                .focusToShake(true)
                 .radian(10)
                 .roundRectOffset(10)
 //                .layoutGravity(Gravity.TOP)
@@ -64,20 +65,20 @@ public class MainActivity extends AppCompatActivity {
 
 
         //use GuideViewQueue
-//        GuideViewQueue guideViewQueue = GuideViewQueue.getInstance();
-//        guideViewQueue.add(new GuideView.Builder(this).targetView(tv1).tipsView(createTextView())
-//                .shape(GuideView.SHAPE_OVAL).create());
-//        guideViewQueue.add(new GuideView.Builder(this).targetView(tv2).tipsView(R.layout.layout_linearlayout)
-//                .layoutGravity(Gravity.BOTTOM).create());
-//        guideViewQueue.add(new GuideView.Builder(this).targetView(ll3).tipsView(createTextView())
-//                .shape(GuideView.SHAPE_RECTANGLE).radian(10).roundRectOffset(10).create());
-//        guideViewQueue.setOnFinallyDismissListener(new GuideViewQueue.OnFinallyDismissListener() {
-//            @Override
-//            public void onDismiss() {
-//                Log.e("GuideViewQueue", "finally dimiss");
-//            }
-//        });
-//        guideViewQueue.start();
+        GuideViewQueue guideViewQueue = GuideViewQueue.getInstance();
+        guideViewQueue.add(new GuideView.Builder(this).targetView(tv1).tipsView(createTextView())
+                .shape(GuideView.SHAPE_OVAL).focusToShake(true).create());
+        guideViewQueue.add(new GuideView.Builder(this).targetView(tv2).tipsView(R.layout.layout_linearlayout)
+                .layoutGravity(Gravity.BOTTOM).create());
+        guideViewQueue.add(new GuideView.Builder(this).targetView(ll3).tipsView(createTextView())
+                .shape(GuideView.SHAPE_RECTANGLE).radian(10).roundRectOffset(10).create());
+        guideViewQueue.setOnFinallyDismissListener(new GuideViewQueue.OnFinallyDismissListener() {
+            @Override
+            public void onDismiss() {
+                Log.e("GuideViewQueue", "finally dimiss");
+            }
+        });
+        guideViewQueue.start();
 
 
         tv1.setOnClickListener(new View.OnClickListener() {
