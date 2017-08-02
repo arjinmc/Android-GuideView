@@ -243,18 +243,18 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
             case SHAPE_OVAL:
                 RectF ovalRectF = new RectF();
                 ovalRectF.left = mTargetViewCenterPoint.x - mRadius / 2 - mTargetView.getWidth() / 2;
-                ovalRectF.top = mTargetViewCenterPoint.y - mRadius / 2 - mTargetView.getHeight() / 2;
+                ovalRectF.top = mTargetViewCenterPoint.y - mRadius / 3 - getStatusBarHeight(mContext) - mTargetView.getHeight() / 2;
                 ovalRectF.right = mTargetViewCenterPoint.x + mRadius / 2 + mTargetView.getWidth() / 2;
-                ovalRectF.bottom = mTargetViewCenterPoint.y + mRadius / 2 + mTargetView.getHeight() / 2;
+                ovalRectF.bottom = mTargetViewCenterPoint.y + mRadius / 3 - getStatusBarHeight(mContext) + mTargetView.getHeight() / 2;
                 tempCanvas.drawOval(ovalRectF, mFocusPaint);
                 break;
             //draw rectangle
             case SHAPE_RECTANGLE:
                 RectF rectRectF = new RectF();
                 rectRectF.left = mTargetViewLeft - mRoundRectOffset;
-                rectRectF.top = mTargetViewTop - mRoundRectOffset;
+                rectRectF.top = mTargetViewTop - getStatusBarHeight(mContext) - mRoundRectOffset;
                 rectRectF.right = mTargetViewRight + mRoundRectOffset;
-                rectRectF.bottom = mTargetViewBottom + mRoundRectOffset;
+                rectRectF.bottom = mTargetViewBottom - getStatusBarHeight(mContext) + mRoundRectOffset;
                 if (mRadian == 0) {
                     tempCanvas.drawRect(rectRectF, mFocusPaint);
                 } else {
@@ -265,7 +265,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
             //draw circle
             default:
                 tempCanvas.drawCircle(mTargetViewCenterPoint.x
-                        , mTargetViewCenterPoint.y
+                        , mTargetViewCenterPoint.y - getStatusBarHeight(mContext)
                         , mRadius, mFocusPaint);
                 break;
         }
@@ -281,44 +281,62 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         if (mTargetViewCenterPoint != null) {
             //layout tips view
             mRadius = calculateTargetViewRadius();
+            ViewGroup.LayoutParams layoutParams = mTargetView.getLayoutParams();
+
             int x, y;
             switch (mTipsViewLayoutGravity) {
                 case Gravity.TOP:
                     x = mTargetViewCenterPoint.x + mOffsetX;
-                    y = mTargetViewCenterPoint.y - mRadius + mOffsetY;
+                    y = mTargetViewCenterPoint.y
+                            - (mShape == SHAPE_OVAL ? mRadius / 3 + mTargetView.getHeight() / 2 : mRadius)
+                            - mTipsView.getMeasuredHeight() / 2
+                            + mOffsetY - getStatusBarHeight(mContext) - (int) mBlurRadius
+                            - (mShape == SHAPE_RECTANGLE ? mRoundRectOffset : 0);
                     mTipsView.layout(
                             x - mTipsView.getMeasuredWidth() / 2
-                            , y - mTargetView.getHeight()
+                            , y - mTipsView.getMeasuredHeight() / 2
                             , x + mTipsView.getMeasuredWidth() / 2
-                            , y);
+                            , y + mTipsView.getMeasuredHeight() / 2);
                     break;
                 case Gravity.LEFT:
-                    x = mTargetViewCenterPoint.x - mRadius + mOffsetX;
-                    y = mTargetViewCenterPoint.y + mOffsetY;
+                    x = mTargetViewCenterPoint.x
+                            - (mShape == SHAPE_OVAL ? (mRadius + mTargetView.getWidth()) / 2 : mRadius)
+                            - (int) mBlurRadius + mOffsetX
+                            - (mShape == SHAPE_RECTANGLE ? mRoundRectOffset : 0);
+                    y = mTargetViewCenterPoint.y + mOffsetY
+                            - getStatusBarHeight(mContext) - (int) mBlurRadius;
                     mTipsView.layout(
                             x - mTipsView.getMeasuredWidth()
-                            , y - mTargetView.getHeight() / 2
+                            , y - mTipsView.getHeight() / 2
                             , x
                             , y + mTipsView.getHeight() / 2);
                     break;
                 case Gravity.RIGHT:
-                    x = mTargetViewCenterPoint.x + mRadius + mOffsetX;
-                    y = mTargetViewCenterPoint.y + mOffsetY;
+                    x = mTargetViewCenterPoint.x
+                            + (mShape == SHAPE_OVAL ? (mRadius + mTargetView.getWidth()) / 2 : mRadius)
+                            + (int) mBlurRadius + mOffsetX
+                            + (mShape == SHAPE_RECTANGLE ? mRoundRectOffset : 0);
+                    y = mTargetViewCenterPoint.y + mOffsetY
+                            - getStatusBarHeight(mContext) - (int) mBlurRadius;
                     mTipsView.layout(
                             x
-                            , y - mTargetView.getHeight() / 2
+                            , y - mTipsView.getMeasuredHeight() / 2
                             , x + mTipsView.getMeasuredWidth()
-                            , y + mTipsView.getHeight() / 2);
+                            , y + mTipsView.getMeasuredHeight() / 2);
                     break;
                 case Gravity.BOTTOM:
                 default:
                     x = mTargetViewCenterPoint.x + mOffsetX;
-                    y = mTargetViewCenterPoint.y + mRadius + mOffsetY;
+                    y = mTargetViewCenterPoint.y
+                            + (mShape == SHAPE_OVAL ? mRadius / 3 + mTargetView.getHeight() / 2 : mRadius)
+                            + mTipsView.getMeasuredHeight() / 2 + mOffsetY
+                            - getStatusBarHeight(mContext) + (int) mBlurRadius
+                            + (mShape == SHAPE_RECTANGLE ? mRoundRectOffset : 0);
                     mTipsView.layout(
                             x - mTipsView.getMeasuredWidth() / 2
-                            , y
+                            , y - mTipsView.getMeasuredHeight() / 2
                             , x + mTipsView.getMeasuredWidth() / 2
-                            , y + mTipsView.getMeasuredHeight());
+                            , y + mTipsView.getMeasuredHeight() / 2);
             }
         }
     }
@@ -369,7 +387,6 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         if (mTargetViewLocation == null) {
             mTargetViewLocation = new int[2];
             mTargetView.getLocationInWindow(mTargetViewLocation);
-            mTargetViewLocation[1] = mTargetViewLocation[1] - getStatusBarHeight(mContext);
             mTargetViewLeft = mTargetViewLocation[0];
             mTargetViewTop = mTargetViewLocation[1];
             mTargetViewRight = mTargetViewLocation[0] + mTargetView.getWidth();
