@@ -74,7 +74,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     private int mTipsViewResId;
     /**
      * the layout gravity of tipsview
-     * support:Gravity.LEFT/TOP/RIGHT/BOTTOM
+     * support:Gravity.LEFT/TOP/RIGHT/BOTTOM/NO_GRAVITY
      */
     private int mTipsViewLayoutGravity;
     /**

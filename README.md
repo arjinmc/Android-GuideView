@@ -65,7 +65,7 @@ This offset is for tips view relative to target view on x,y axis,default values 
 
 ### layout gravity of tips view
 This layout gravity is relative to target view.
-* layoutGravity(gravityInt)  default value is Gravity.BOTTOM
+* layoutGravity(gravityInt)  default value is Gravity.NO_GRAVITY
 
 <strong>Values</strong>
 * Gravity.LEFT
@@ -124,4 +124,25 @@ GuideView guideView = new GuideView.Builder(activitycontext)
 //                })
 //                
                 .create();
+```
+
+## GuideViewQueque
+GuideViewQueque is a static queue for guideviews.It will show every GuideView you haved added in order and finally callback the OnFinallyDismissListener,it will be null when its jobs is done.
+
+Here is a sample below:
+```java
+GuideViewQueue guideViewQueue = GuideViewQueue.getInstance();
+guideViewQueue.add(new GuideView.Builder(this).targetView(tv1).tipsView(createTextView())
+        .shape(GuideView.SHAPE_OVAL).create());
+guideViewQueue.add(new GuideView.Builder(this).targetView(tv2).tipsView(R.layout.layout_linearlayout)
+        .layoutGravity(Gravity.BOTTOM).create());
+guideViewQueue.add(new GuideView.Builder(this).targetView(ll3).tipsView(createTextView())
+        .shape(GuideView.SHAPE_RECTANGLE).radian(10).roundRectOffset(10).create());
+guideViewQueue.setOnFinallyDismissListener(new GuideViewQueue.OnFinallyDismissListener() {
+    @Override
+    public void onDismiss() {
+        Log.e("GuideViewQueue","finally dimiss");
+    }
+});
+guideViewQueue.start();
 ```
