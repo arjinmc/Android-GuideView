@@ -72,6 +72,7 @@ This layout gravity is relative to target view.
 * Gravity.TOP
 * Gravity.RIGHT
 * Gravity.BOTTOM
+* Gravity.NO_GRAVITY
 
 ### background color
 bgColor(colorInt) default color is #b0000000

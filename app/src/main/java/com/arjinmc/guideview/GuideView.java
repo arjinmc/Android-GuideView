@@ -291,6 +291,10 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
 
             int x, y;
             switch (mTipsViewLayoutGravity) {
+                case Gravity.NO_GRAVITY:
+                    mTipsView.layout(
+                            0,0,mTipsView.getMeasuredWidth(), mTipsView.getMeasuredHeight());
+                    break;
                 case Gravity.TOP:
                     x = mTargetViewCenterPoint.x + mOffsetX;
                     y = mTargetViewCenterPoint.y
