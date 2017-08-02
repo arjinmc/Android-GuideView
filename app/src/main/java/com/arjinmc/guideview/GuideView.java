@@ -71,6 +71,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
      * tips view guide to the focus view
      */
     private View mTipsView;
+    private int mTipsViewResId;
     /**
      * the layout gravity of tipsview
      * support:Gravity.LEFT/TOP/RIGHT/BOTTOM
@@ -126,6 +127,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         isRealClickFocus = params.isRealClickFocus;
         mTargetView = params.targetView;
         mTargetViewId = params.targetViewId;
+        mTipsViewResId = params.tipsViewResId;
         mTipsView = params.tipsView;
         mTipsViewLayoutGravity = params.layoutGravity;
         mOffsetX = params.offsetX;
@@ -143,7 +145,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         }
         if (mTargetView == null)
             throw new GuideViewInitException("TargetView cannot be null!");
-        if (mTipsView == null)
+        if (mTipsView == null && mTipsViewResId == 0)
             throw new GuideViewInitException("TipsView cannot be null!");
         init();
     }
@@ -162,6 +164,10 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
 
         setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        if (mTipsView == null && mTipsViewResId != 0)
+            mTipsView = LayoutInflater.from(mContext).inflate(mTipsViewResId, this, false);
+
         addView(mTipsView);
         setVisibility(View.GONE);
         setBackgroundColor(Color.TRANSPARENT);
@@ -491,8 +497,8 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
             return this;
         }
 
-        public Builder tipsView(@LayoutRes int layoutId) {
-            param.tipsView = LayoutInflater.from(context).inflate(layoutId, null);
+        public Builder tipsView(@LayoutRes int tipsViewLayoutResId) {
+            param.tipsViewResId = tipsViewLayoutResId;
             return this;
         }
 
@@ -531,6 +537,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         public int offsetX, offsetY;
         public int layoutGravity;
         public int targetViewId;
+        public int tipsViewResId;
         public OnDismissListener onDismissListener;
     }
 
