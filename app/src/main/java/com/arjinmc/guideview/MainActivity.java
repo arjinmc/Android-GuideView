@@ -72,13 +72,13 @@ public class MainActivity extends AppCompatActivity {
                 .layoutGravity(Gravity.BOTTOM).create());
         guideViewQueue.add(new GuideView.Builder(this).targetView(ll3).tipsView(createTextView())
                 .shape(GuideView.SHAPE_RECTANGLE).radian(10).roundRectOffset(10).create());
-        guideViewQueue.setOnFinallyDismissListener(new GuideViewQueue.OnFinallyDismissListener() {
+        guideViewQueue.setOnCompleteDismissListener(new GuideViewQueue.OnCompleteDismissListener() {
             @Override
             public void onDismiss() {
                 Log.e("GuideViewQueue", "finally dimiss");
             }
         });
-        guideViewQueue.start();
+        guideViewQueue.show();
 
 
         tv1.setOnClickListener(new View.OnClickListener() {

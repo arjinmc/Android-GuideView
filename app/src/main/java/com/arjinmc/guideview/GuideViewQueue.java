@@ -13,7 +13,7 @@ public final class GuideViewQueue {
 
     private static GuideViewQueue sGuideViewQueue;
     private static List<GuideView> sGuideViewList;
-    private static OnFinallyDismissListener sOnFinallyDismissListener;
+    private static OnCompleteDismissListener sOnCompleteDismissListener;
 
     public static synchronized GuideViewQueue getInstance() {
 
@@ -40,17 +40,17 @@ public final class GuideViewQueue {
     /**
      * set the finally dismissListenter callback
      *
-     * @param onFinallyDismissListener
+     * @param onCompleteDismissListener
      */
-    public static void setOnFinallyDismissListener(OnFinallyDismissListener onFinallyDismissListener) {
-        sOnFinallyDismissListener = onFinallyDismissListener;
+    public static void setOnCompleteDismissListener(OnCompleteDismissListener onCompleteDismissListener) {
+        sOnCompleteDismissListener = onCompleteDismissListener;
     }
 
     /**
-     * start the queque for guideview that to show each guideview
-     * then finally callback the OnFinallyDismissListener
+     * show the queque for guideview that to show each guideview
+     * then finally callback the OnCompleteDismissListener
      */
-    public static void start() {
+    public static void show() {
         if (sGuideViewList == null || sGuideViewList.isEmpty())
             return;
         final int size = sGuideViewList.size();
@@ -62,14 +62,14 @@ public final class GuideViewQueue {
                     if (currrentPosition != size - 1)
                         sGuideViewList.get(currrentPosition + 1).show();
                     else {
-                        if (sOnFinallyDismissListener != null)
-                            sOnFinallyDismissListener.onDismiss();
+                        if (sOnCompleteDismissListener != null)
+                            sOnCompleteDismissListener.onDismiss();
 
                         //GC
                         sGuideViewList.clear();
                         sGuideViewList = null;
                         sGuideViewQueue = null;
-                        sOnFinallyDismissListener = null;
+                        sOnCompleteDismissListener = null;
                     }
 
                 }
@@ -78,7 +78,7 @@ public final class GuideViewQueue {
         sGuideViewList.get(0).show();
     }
 
-    public interface OnFinallyDismissListener {
+    public interface OnCompleteDismissListener {
         void onDismiss();
     }
 
